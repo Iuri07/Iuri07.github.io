@@ -1,55 +1,78 @@
-let c;
+let resolution = 100;
+let circle_color;
 let t = 0;
-let r;
-let speed = 0.02
+let speed = 0.008
+let strength = 20
 
-function drawCircle( max_r, color, t ) {
-  beginShape();
-  strokeWeight( 5 );
-  noFill();
-  stroke( color );
-  for ( let angle = 0; angle < TWO_PI; angle += 0.05 ) {
-    let off = cos(angle+t*1.5);
-    let r = map( off, 0, 1, max_r * .99, max_r );
-    let circle_x = r * cos( angle );
-    let circle_y = r * sin( angle );
-    vertex( circle_x, circle_y );
-  }
-  endShape( CLOSE );
+
+function getNoise(t,angle){
+    return(map(noise(t+cos(angle)/100, t+sin(angle)/100),0,1,-strength,strength))
 }
 
-function setup() {
-  createCanvas( windowWidth, windowHeight );
+function drawCircle(radius, color, resolution, t){
+    strokeWeight(5);
+    noFill();
+    step = 360/resolution
+    stroke(color);
+    let i = 0
+
+    beginShape()
+    let first_anchor=null
+    for (let angle = 0; i <= resolution+1; angle+=step){
+        let anchor = null
+
+        if(resolution==i){
+            angle=0
+        }
+        anchor = createVector((radius+noise(t,angle)*strength)*cos(angle), (radius+noise(t,angle)*strength)*sin(angle))
+
+        if(angle==0){
+            first_anchor = anchor
+        }
+
+        curveVertex(anchor.x, anchor.y)   
+        i+=1
+    }
+    curveVertex(first_anchor.x, first_anchor.y)
+    endShape()
+}
+
+function mouseClicked(){
+    resolution+=1
+}
+
+function setup(){
+    createCanvas(windowWidth, windowHeight);
+    angleMode(DEGREES);
+}
+
+function draw(){
+    radius = Math.min(width, height) / 2 - 50;
+
+    blendMode(BLEND)
+    background(20);
+
+    colorMode(RGB, 255, 255, 255, 1);
+    blendMode(SCREEN);
+    noFill();
+    translate(width / 2, height / 2);
+
+    rotate(t*3)
+    circle_color = color(255, 0, 0, .7);
+    translate(0, 0)
+    drawCircle(radius, circle_color, resolution, t);
+    rotate(TWO_PI / 3+t)
+    circle_color = color(0, 255, 0, .7);
+    drawCircle(radius, circle_color, resolution, t+1)
+
+    rotate(TWO_PI / 3-t)
+    circle_color = color(0, 0, 255, .7);
+    drawCircle(radius, circle_color, resolution, t+2)
+    
+    t += speed
 
 }
 
-function draw() {
-  r = Math.min( width, height ) / 2 - 50;
-
-  blendMode( BLEND )
-  background( 20 );
-
-  colorMode( RGB, 255, 255, 255, 1 );
-  blendMode( SCREEN );
-  noFill();
-  translate( width / 2, height / 2 );
-
-  c = color( 255, 0, 0, .7 );
-  translate( 0, 0 )
-  drawCircle( r, c, t );
-
-  rotate( PI / 3 )
-  c = color( 0, 255, 0, .7 );
-  drawCircle( r, c, t );
-
-  rotate( PI / 3 )
-  c = color( 0, 0, 255, .7 );
-  drawCircle( r, c, t );
-
-  t += speed
-
-}
-
-function windowResized() {
-  resizeCanvas( windowWidth, windowHeight );
+function windowResized(){
+    resizeCanvas(windowWidth, windowHeight);
 }
