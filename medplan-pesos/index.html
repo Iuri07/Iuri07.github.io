@@ -373,7 +373,17 @@
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
     color: var(--fg-1);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
   }
+  .sim-aulas-header-cols {
+    display: flex;
+    gap: var(--sp-3);
+    font-size: 10px;
+  }
+  .sim-aulas-header-cols .col-prio { color: var(--accent); }
+  .sim-aulas-header-cols .col-q    { color: var(--syn-cyan); }
   .sim-week-header strong {
     color: var(--accent);
     font-size: var(--fs-md);
@@ -396,8 +406,10 @@
     font-size: var(--fs-xs);
     transition: background var(--dur-micro) var(--ease-out);
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: var(--sp-1);
+    grid-template-columns: 1fr 60px 50px;
+    column-gap: var(--sp-3);
+    row-gap: 2px;
+    align-items: center;
   }
   .sim-aula:hover { background: var(--bg-2); }
   .sim-aula:last-child { border-bottom: none; }
@@ -405,25 +417,58 @@
   .sim-aula-name {
     color: var(--fg-0);
     grid-column: 1;
+    grid-row: 1;
   }
   .sim-aula-meta {
-    grid-column: 1;
+    grid-column: 1 / -1;
+    grid-row: 2;
     color: var(--fg-2);
     font-size: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: baseline;
   }
   .sim-aula-meta .mat { color: var(--accent-soft); }
-  .sim-aula-q {
+  .sim-aula-meta .formula-inline {
+    margin-left: auto;
+    color: var(--fg-1);
+    font-variant-numeric: tabular-nums;
+    background: var(--bg-2);
+    padding: 1px 6px;
+    border-radius: var(--radius-1);
+  }
+  .sim-aula-prio {
     grid-column: 2;
-    grid-row: 1 / 3;
-    align-self: center;
+    grid-row: 1;
+    text-align: right;
+    line-height: 1.1;
+  }
+  .sim-aula-prio-value {
+    display: block;
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .sim-aula-prio-label {
+    display: block;
+    font-size: 9px;
+    color: var(--fg-2);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+  .sim-aula-q {
+    grid-column: 3;
+    grid-row: 1;
     font-size: var(--fs-md);
     font-weight: 600;
     color: var(--syn-cyan);
     font-variant-numeric: tabular-nums;
-    min-width: 36px;
     text-align: right;
   }
   .sim-aula.excluded .sim-aula-q { color: var(--fg-2); }
+  .sim-aula.excluded .sim-aula-prio-value { color: var(--fg-2); }
   .sim-aula.has-sim {
     border-left: 3px solid var(--accent);
     padding-left: calc(var(--sp-4) - 3px);
@@ -487,11 +532,23 @@
     color: var(--fg-0);
     line-height: 1.3;
   }
+  .sim-day-aula-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
   .sim-day-aula-q {
     color: var(--syn-cyan);
     font-weight: 600;
     font-size: 11px;
     font-variant-numeric: tabular-nums;
+  }
+  .sim-day-aula-prio {
+    color: var(--accent);
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
   }
 
   /* ─── footer ──────────────────────────────────────────────────── */
@@ -735,7 +792,11 @@
     <div class="sim-grid">
       <div class="sim-aulas">
         <div class="sim-aulas-header">
-          aulas <span class="muted-inline">(clique pra simular A1)</span>
+          <span>aulas <span class="muted-inline">(clique pra simular A1)</span></span>
+          <span class="sim-aulas-header-cols">
+            <span class="col-prio">prio</span>
+            <span class="col-q">q/sem</span>
+          </span>
         </div>
         <ul id="sim-aulas-list"></ul>
       </div>
@@ -872,12 +933,20 @@ function renderAulasList(enriched, included) {
     const scoreStr = hasSim ? `<span class="score">A1 simulado ${simA1}%</span>` : effStr;
     const matShort = MATERIA_SHORT[a.materia] || '?';
     const sugStr = inc ? `${a.sug}q` : '—';
+    // Breakdown da fórmula: bw × (0.5 + weakness) = priority
+    const mult = (0.5 + a.weakness).toFixed(2);
+    const breakdown = `${a.bw.toFixed(1)} × ${mult}`;
     return `
       <li class="sim-aula ${!inc ? 'excluded' : ''} ${hasSim ? 'has-sim' : ''}" data-id="${a.id}">
         <span class="sim-aula-name">${a.name}</span>
+        <span class="sim-aula-prio">
+          <span class="sim-aula-prio-value">${a.priority.toFixed(1)}</span>
+          <span class="sim-aula-prio-label">prio</span>
+        </span>
         <span class="sim-aula-q">${sugStr}</span>
         <span class="sim-aula-meta">
           <span class="mat">${matShort}</span> · ${a.totalQ}q banco · ${scoreStr}
+          <span class="formula-inline">${breakdown}</span>
         </span>
       </li>`;
   }).join('');
@@ -893,7 +962,10 @@ function renderWeek(days, budget, perDayMax) {
       .sort((a, b) => b.priority - a.priority)
       .map(a => `
         <div class="sim-day-aula ${sim.has(a.id) ? 'has-sim' : ''}">
-          <span class="sim-day-aula-q">${a.sug}q</span>
+          <span class="sim-day-aula-row">
+            <span class="sim-day-aula-q">${a.sug}q</span>
+            <span class="sim-day-aula-prio">prio ${a.priority.toFixed(1)}</span>
+          </span>
           <span class="sim-day-aula-name">${a.name.slice(0, 28)}${a.name.length > 28 ? '…' : ''}</span>
         </div>`).join('');
     return `
