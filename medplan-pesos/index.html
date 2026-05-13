@@ -294,6 +294,206 @@
   }
   .example .delta .up { color: var(--syn-green); font-weight: 600; }
 
+  /* ─── simulador ───────────────────────────────────────────────── */
+  .sim-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+    align-items: end;
+    padding: var(--sp-4);
+    background: var(--bg-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-2);
+    margin: var(--sp-3) 0 var(--sp-5);
+  }
+  .sim-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--fg-1);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+  .sim-controls input {
+    width: 90px;
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--bg-2);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-1);
+    color: var(--fg-0);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .sim-controls input:focus {
+    outline: none;
+    border-color: var(--accent-soft);
+  }
+  #sim-reset {
+    margin-left: auto;
+    padding: var(--sp-2) var(--sp-4);
+    background: var(--bg-2);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-1);
+    color: var(--fg-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    cursor: pointer;
+    transition: all var(--dur-micro) var(--ease-out);
+  }
+  #sim-reset:hover {
+    color: var(--fg-0);
+    border-color: var(--accent-soft);
+  }
+
+  .sim-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) 2fr;
+    gap: var(--sp-4);
+  }
+  @media (max-width: 720px) {
+    .sim-grid { grid-template-columns: 1fr; }
+  }
+  .sim-aulas, .sim-week {
+    background: var(--bg-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-2);
+    overflow: hidden;
+  }
+  .sim-aulas-header, .sim-week-header {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--line-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--fg-1);
+  }
+  .sim-week-header strong {
+    color: var(--accent);
+    font-size: var(--fs-md);
+    margin-right: var(--sp-2);
+  }
+  .muted-inline { color: var(--fg-2); text-transform: none; letter-spacing: 0; }
+
+  #sim-aulas-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 520px;
+    overflow-y: auto;
+  }
+  .sim-aula {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1px solid var(--line-1);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    transition: background var(--dur-micro) var(--ease-out);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--sp-1);
+  }
+  .sim-aula:hover { background: var(--bg-2); }
+  .sim-aula:last-child { border-bottom: none; }
+  .sim-aula.excluded { opacity: 0.4; }
+  .sim-aula-name {
+    color: var(--fg-0);
+    grid-column: 1;
+  }
+  .sim-aula-meta {
+    grid-column: 1;
+    color: var(--fg-2);
+    font-size: 10px;
+  }
+  .sim-aula-meta .mat { color: var(--accent-soft); }
+  .sim-aula-q {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--syn-cyan);
+    font-variant-numeric: tabular-nums;
+    min-width: 36px;
+    text-align: right;
+  }
+  .sim-aula.excluded .sim-aula-q { color: var(--fg-2); }
+  .sim-aula.has-sim {
+    border-left: 3px solid var(--accent);
+    padding-left: calc(var(--sp-4) - 3px);
+  }
+  .sim-aula.has-sim .sim-aula-meta .score { color: var(--accent); font-weight: 600; }
+
+  .sim-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--line-1);
+  }
+  @media (max-width: 720px) {
+    .sim-days {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .sim-day {
+    background: var(--bg-1);
+    padding: var(--sp-3);
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+  .sim-day-header {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--fg-1);
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--line-1);
+    display: flex;
+    justify-content: space-between;
+  }
+  .sim-day-header .total {
+    color: var(--syn-cyan);
+    font-variant-numeric: tabular-nums;
+  }
+  .sim-day-header .total.over {
+    color: var(--syn-red);
+  }
+  .sim-day-aulas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+  .sim-day-aula {
+    background: var(--bg-2);
+    border-radius: var(--radius-1);
+    padding: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sim-day-aula.has-sim { border-left: 2px solid var(--accent); }
+  .sim-day-aula-name {
+    color: var(--fg-0);
+    line-height: 1.3;
+  }
+  .sim-day-aula-q {
+    color: var(--syn-cyan);
+    font-weight: 600;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
   /* ─── footer ──────────────────────────────────────────────────── */
   footer {
     margin-top: var(--sp-9);
@@ -507,9 +707,240 @@
     </div>
   </section>
 
+  <section>
+    <h2><span class="num">⑦</span>simulação interativa</h2>
+    <p>
+      Dados reais do DB de testes: 30 tópicos depth-2 com mais de 50
+      questões no banco do Estratégia. Clique em qualquer aula pra
+      simular uma nota de A1 — a prioridade recalcula em tempo real e o
+      calendário semanal redistribui.
+    </p>
+
+    <div class="sim-controls">
+      <label>
+        <span>budget semanal</span>
+        <input type="number" id="sim-budget" min="50" max="700" step="10" value="320" />
+      </label>
+      <label>
+        <span>min por aula</span>
+        <input type="number" id="sim-min" min="1" max="20" value="8" />
+      </label>
+      <label>
+        <span>max por dia</span>
+        <input type="number" id="sim-cap" min="20" max="200" value="70" />
+      </label>
+      <button id="sim-reset" type="button">resetar simulações</button>
+    </div>
+
+    <div class="sim-grid">
+      <div class="sim-aulas">
+        <div class="sim-aulas-header">
+          aulas <span class="muted-inline">(clique pra simular A1)</span>
+        </div>
+        <ul id="sim-aulas-list"></ul>
+      </div>
+      <div class="sim-week">
+        <div class="sim-week-header">
+          <strong id="sim-total">0/320</strong>
+          <span class="muted-inline">questões distribuídas</span>
+        </div>
+        <div class="sim-days" id="sim-days"></div>
+      </div>
+    </div>
+  </section>
+
   <footer>
     medplan v0.1.8 · electron/sync/schedule.ts · 2026
   </footer>
+
+<script>
+'use strict'
+// Dados reais exportados do DB local (Pediatria/Cirurgia/Clínica/Preventiva,
+// depth-2, >50 questões). Servem como sandbox pro simulador — mexer no
+// score "simulado" não afeta nada além da página.
+const AULAS = [{"id": 276, "name": "Neoplasias do Sistema Digestivo", "materia": "Clínica Médica", "totalQ": 2120, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 260, "name": "Diabetes", "materia": "Clínica Médica", "totalQ": 2038, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 141, "name": "Avaliação Inicial: Vias aéreas, Ventilação e Choque", "materia": "Cirurgia", "totalQ": 1780, "tier": "muito-alta", "acc": null, "a1pct": 88.0, "a2pct": 80.0}, {"id": 158, "name": "Abdome Agudo Inflamatório", "materia": "Cirurgia", "totalQ": 1665, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 241, "name": "Aterosclerose e Doença Arterial Coronariana", "materia": "Clínica Médica", "totalQ": 1565, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 432, "name": "Vigilância em Saúde", "materia": "Medicina Preventiva", "totalQ": 1533, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 491, "name": "Imunizações/Vacinação", "materia": "Pediatria", "totalQ": 1514, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 435, "name": "Estudos Epidemiológicos", "materia": "Medicina Preventiva", "totalQ": 1300, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 261, "name": "Tireoide", "materia": "Clínica Médica", "totalQ": 1260, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 428, "name": "Medidas de saúde coletiva", "materia": "Medicina Preventiva", "totalQ": 1257, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 411, "name": "Princípios e Diretrizes do Sistema Único de Saúde (SUS)", "materia": "Medicina Preventiva", "totalQ": 1248, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 239, "name": "Hipertensão Arterial Sistêmica (HAS)", "materia": "Clínica Médica", "totalQ": 1217, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 243, "name": "Arritmias Cardíacas", "materia": "Clínica Médica", "totalQ": 1165, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 271, "name": "Esôfago", "materia": "Clínica Médica", "totalQ": 1088, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 415, "name": "Atenção Primária à Saúde (APS) no Brasil", "materia": "Medicina Preventiva", "totalQ": 1086, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 274, "name": "Intestinos", "materia": "Clínica Médica", "totalQ": 1079, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 427, "name": "Processo saúde-doença", "materia": "Medicina Preventiva", "totalQ": 1077, "tier": "alta", "acc": null, "a1pct": null, "a2pct": null}, {"id": 437, "name": "Testes Diagnósticos", "materia": "Medicina Preventiva", "totalQ": 1009, "tier": "muito-alta", "acc": null, "a1pct": 92.3, "a2pct": 80.0}, {"id": 142, "name": "Trauma Abdominal e Pélvico", "materia": "Cirurgia", "totalQ": 968, "tier": "alta", "acc": null, "a1pct": 70.8, "a2pct": null}, {"id": 335, "name": "Glomerulopatias", "materia": "Clínica Médica", "totalQ": 964, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 360, "name": "Artropatias inflamatórias", "materia": "Clínica Médica", "totalQ": 912, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 275, "name": "Hemorragia Digestiva (HD)", "materia": "Clínica Médica", "totalQ": 896, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 362, "name": "Doenças autoimunes do tecido conjuntivo", "materia": "Clínica Médica", "totalQ": 873, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 273, "name": "Pâncreas", "materia": "Clínica Médica", "totalQ": 864, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 492, "name": "Amamentação/ Aleitamento Materno", "materia": "Pediatria", "totalQ": 853, "tier": "muito-alta", "acc": null, "a1pct": 83.3, "a2pct": 83.3}, {"id": 412, "name": "Principais marcos legais do SUS", "materia": "Medicina Preventiva", "totalQ": 845, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 508, "name": "Doenças exantemáticas", "materia": "Pediatria", "totalQ": 829, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 503, "name": "Pneumonias/Broncopneumonias (BCP) na Infância", "materia": "Pediatria", "totalQ": 795, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 240, "name": "Insuficiência Cardíaca", "materia": "Clínica Médica", "totalQ": 794, "tier": null, "acc": null, "a1pct": null, "a2pct": null}, {"id": 315, "name": "Infecções do Sistema Nervoso Central", "materia": "Clínica Médica", "totalQ": 721, "tier": null, "acc": null, "a1pct": null, "a2pct": null}];
+
+const TIER_WEIGHT = { 'muito-alta': 16, 'alta': 8, 'media': 4, 'baixa': 2, 'muito-baixa': 1 };
+const DAY_NAMES = ['SEG','TER','QUA','QUI','SEX','SAB','DOM'];
+const MATERIA_SHORT = {
+  'Pediatria': 'PED', 'Cirurgia': 'CIR',
+  'Clínica Médica': 'CLI', 'Medicina Preventiva': 'PREV',
+  'Ginecologia': 'GIN', 'Obstetrícia': 'OBS', 'Outros': 'OUT'
+};
+
+// Estado: simulações de A1 por aula (id → pct). Vazio = sem simulação.
+const sim = new Map();
+
+function baseWeight(a) {
+  if (a.totalQ > 0) return Math.sqrt(a.totalQ);
+  if (a.tier && TIER_WEIGHT[a.tier] != null) return TIER_WEIGHT[a.tier];
+  return 4;
+}
+
+/** Reproduz aulaPriority. Aceita override de A1 vindo do simulador. */
+function computePriority(a) {
+  const bw = baseWeight(a);
+  // latestReviewPct: A4 → A3 → A2 → A1 (na ordem do schedule.ts).
+  // Simulação do user vai pra A1 (preserva A2-A4 reais se houver).
+  let latest = null;
+  // (não temos A3/A4 no DB ainda — só A1/A2 nesta amostra)
+  if (a.a2pct != null) latest = a.a2pct;
+  const simA1 = sim.has(a.id) ? sim.get(a.id) : a.a1pct;
+  if (latest == null && simA1 != null) latest = simA1;
+
+  let eff = null;
+  if (latest != null && a.acc != null) eff = (latest + a.acc) / 2;
+  else eff = latest != null ? latest : a.acc;
+
+  const weakness = eff != null ? Math.max(0, 1 - eff/100) : 0.5;
+  return { priority: bw * (0.5 + weakness), bw, weakness, eff };
+}
+
+function computeSchedule() {
+  const budget = +document.getElementById('sim-budget').value;
+  const perAulaMin = +document.getElementById('sim-min').value;
+  const perDayMax = +document.getElementById('sim-cap').value;
+
+  const enriched = AULAS.map(a => ({ ...a, ...computePriority(a) }))
+                        .sort((x, y) => y.priority - x.priority);
+
+  // Greedy: inclui enquanto share >= perAulaMin
+  const included = [];
+  let sumP = 0;
+  for (const a of enriched) {
+    if (a.priority <= 0) break;
+    const newSum = sumP + a.priority;
+    if ((budget * a.priority) / newSum < perAulaMin) break;
+    included.push(a);
+    sumP = newSum;
+  }
+
+  // Largest remainder
+  const raw = included.map(a => budget * a.priority / sumP);
+  const sug = raw.map(Math.floor);
+  let assigned = sug.reduce((s, x) => s + x, 0);
+  let leftover = budget - assigned;
+  const idxByFrac = raw
+    .map((r, i) => ({ i, frac: r - Math.floor(r) }))
+    .sort((a, b) => b.frac - a.frac);
+  for (const { i } of idxByFrac) {
+    if (leftover <= 0) break;
+    sug[i]++;
+    leftover--;
+  }
+  // Safety floor
+  for (let i = 0; i < sug.length; i++) {
+    if (sug[i] > 0 && sug[i] < perAulaMin) sug[i] = perAulaMin;
+  }
+  for (let i = 0; i < included.length; i++) included[i].sug = sug[i];
+
+  // Distribui em 7 dias round-robin por priority, respeitando cap diário
+  const days = Array.from({ length: 7 }, (_, i) => ({
+    idx: i, name: DAY_NAMES[i], aulas: [], used: 0
+  }));
+  let dayIdx = 0;
+  for (const a of included) {
+    let placed = false;
+    for (let off = 0; off < 7; off++) {
+      const d = days[(dayIdx + off) % 7];
+      if (d.used + a.sug <= perDayMax) {
+        d.aulas.push(a);
+        d.used += a.sug;
+        placed = true;
+        dayIdx = (dayIdx + 1) % 7;
+        break;
+      }
+    }
+    if (!placed) {
+      // Spread overflow no dia menos carregado
+      const d = days.reduce((m, x) => x.used < m.used ? x : m, days[0]);
+      d.aulas.push(a);
+      d.used += a.sug;
+    }
+  }
+
+  return { enriched, included, days, budget, perDayMax };
+}
+
+function renderAulasList(enriched, included) {
+  const incIds = new Set(included.map(a => a.id));
+  const html = enriched.map(a => {
+    const inc = incIds.has(a.id);
+    const simA1 = sim.get(a.id);
+    const hasSim = simA1 != null;
+    const effStr = a.eff != null ? `eff ${a.eff.toFixed(0)}%` : 'sem dado';
+    const scoreStr = hasSim ? `<span class="score">A1 simulado ${simA1}%</span>` : effStr;
+    const matShort = MATERIA_SHORT[a.materia] || '?';
+    const sugStr = inc ? `${a.sug}q` : '—';
+    return `
+      <li class="sim-aula ${!inc ? 'excluded' : ''} ${hasSim ? 'has-sim' : ''}" data-id="${a.id}">
+        <span class="sim-aula-name">${a.name}</span>
+        <span class="sim-aula-q">${sugStr}</span>
+        <span class="sim-aula-meta">
+          <span class="mat">${matShort}</span> · ${a.totalQ}q banco · ${scoreStr}
+        </span>
+      </li>`;
+  }).join('');
+  document.getElementById('sim-aulas-list').innerHTML = html;
+}
+
+function renderWeek(days, budget, perDayMax) {
+  const total = days.reduce((s, d) => s + d.used, 0);
+  document.getElementById('sim-total').textContent = `${total}/${budget}`;
+  const html = days.map(d => {
+    const over = d.used > perDayMax;
+    const aulasHtml = d.aulas
+      .sort((a, b) => b.priority - a.priority)
+      .map(a => `
+        <div class="sim-day-aula ${sim.has(a.id) ? 'has-sim' : ''}">
+          <span class="sim-day-aula-q">${a.sug}q</span>
+          <span class="sim-day-aula-name">${a.name.slice(0, 28)}${a.name.length > 28 ? '…' : ''}</span>
+        </div>`).join('');
+    return `
+      <div class="sim-day">
+        <div class="sim-day-header">
+          <span>${d.name}</span>
+          <span class="total ${over ? 'over' : ''}">${d.used}/${perDayMax}</span>
+        </div>
+        <div class="sim-day-aulas">${aulasHtml || '<span class="muted-inline" style="font-size:10px">—</span>'}</div>
+      </div>`;
+  }).join('');
+  document.getElementById('sim-days').innerHTML = html;
+}
+
+function render() {
+  const { enriched, included, days, budget, perDayMax } = computeSchedule();
+  renderAulasList(enriched, included);
+  renderWeek(days, budget, perDayMax);
+}
+
+document.getElementById('sim-aulas-list').addEventListener('click', e => {
+  const li = e.target.closest('.sim-aula');
+  if (!li) return;
+  const id = +li.dataset.id;
+  // Cicla entre: limpo → 30% → 60% → 90% → limpo. 30 é "errou bem" — turbo
+  // pra weakness; 90 é "dominou", baixa weakness. Dá pra ver o efeito em
+  // dois sentidos em três cliques.
+  const cur = sim.get(id);
+  let next;
+  if (cur == null) next = 30;
+  else if (cur === 30) next = 60;
+  else if (cur === 60) next = 90;
+  else next = null;
+  if (next == null) sim.delete(id); else sim.set(id, next);
+  render();
+});
+document.getElementById('sim-budget').addEventListener('input', render);
+document.getElementById('sim-min').addEventListener('input', render);
+document.getElementById('sim-cap').addEventListener('input', render);
+document.getElementById('sim-reset').addEventListener('click', () => {
+  sim.clear();
+  render();
+});
+
+render();
+</script>
+
 
 </div>
 </body>
