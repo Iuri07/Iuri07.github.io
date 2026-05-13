@@ -333,8 +333,7 @@
     outline: none;
     border-color: var(--accent-soft);
   }
-  #sim-reset {
-    margin-left: auto;
+  #sim-reset, #sim-example {
     padding: var(--sp-2) var(--sp-4);
     background: var(--bg-2);
     border: 1px solid var(--line-1);
@@ -346,6 +345,15 @@
     letter-spacing: var(--tracking-wide);
     cursor: pointer;
     transition: all var(--dur-micro) var(--ease-out);
+  }
+  #sim-example {
+    margin-left: auto;
+    color: var(--accent);
+    border-color: var(--accent-soft);
+  }
+  #sim-example:hover {
+    color: var(--fg-0);
+    background: rgba(155, 123, 255, 0.08);
   }
   #sim-reset:hover {
     color: var(--fg-0);
@@ -898,6 +906,7 @@
         <span>max por dia</span>
         <input type="number" id="sim-cap" min="20" max="200" value="70" />
       </label>
+      <button id="sim-example" type="button">aplicar exemplo</button>
       <button id="sim-reset" type="button">resetar simulações</button>
     </div>
 
@@ -1119,6 +1128,27 @@ document.getElementById('sim-min').addEventListener('input', render);
 document.getElementById('sim-cap').addEventListener('input', render);
 document.getElementById('sim-reset').addEventListener('click', () => {
   sim.clear();
+  render();
+});
+
+// Preset: 8 notas A1 simulando um cenário realista — algumas aulas onde
+// o user 'errou' (sobe na prio) e outras onde 'dominou' (cai e libera
+// budget). Útil pra ver de relance o redistribuir sem 8 cliques.
+const EXAMPLE_A1 = {
+  'Diabetes':                                30,
+  'Aterosclerose e Doença Arterial Coronariana': 40,
+  'Trauma Abdominal e Pélvico':              35,
+  'Doenças exantemáticas':                   50,
+  'Neoplasias do Sistema Digestivo':         90,
+  'Imunizações/Vacinação':                   95,
+  'Vigilância em Saúde':                     85,
+  'Estudos Epidemiológicos':                 80,
+};
+document.getElementById('sim-example').addEventListener('click', () => {
+  sim.clear();
+  for (const a of AULAS) {
+    if (EXAMPLE_A1[a.name] != null) sim.set(a.id, EXAMPLE_A1[a.name]);
+  }
   render();
 });
 
