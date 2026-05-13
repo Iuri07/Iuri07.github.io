@@ -1,0 +1,37 @@
+# Deploy estático pro GitHub Pages.
+# O modo legacy do Pages (auto-build Jekyll por push) foi descontinuado.
+# Esse workflow faz o que o legacy fazia: pega a raiz do repo e publica
+# como site. Roda em qualquer push pra master + via dispatch manual.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Cancela deploys antigos quando um novo push chega — sem isso, dois
+# pushes rápidos enfileiram dois deploys e o segundo pode sobrescrever
+# o primeiro pela metade.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
