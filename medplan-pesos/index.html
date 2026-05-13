@@ -487,21 +487,15 @@
 
   .sim-days {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    /* grid-template-columns é setado via JS (varia com numDays) */
     gap: 1px;
     background: var(--line-1);
   }
-  /* mobile: scroll horizontal preserva o "calendário de 7 dias" sem
-   * empilhar em coluna estranha (7 não divide bonito em 2). */
-  @media (max-width: 720px) {
-    .sim-week {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .sim-days {
-      grid-template-columns: repeat(7, 200px);
-      min-width: max-content;
-    }
+  /* Sempre dá scroll horizontal quando o conteúdo passa do container —
+   * funciona pra 14 dias em telas largas E pra 7 dias em mobile. */
+  .sim-week {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .sim-day {
     background: var(--bg-1);
@@ -663,11 +657,6 @@
     h1 { font-size: var(--fs-xl); }
     .formula.lg { font-size: var(--fs-md); }
     .container { padding: var(--sp-5) var(--sp-3); }
-    /* dia do calendário menor pra caber 2 quase visíveis e dar dica
-     * de scroll horizontal. */
-    .sim-days {
-      grid-template-columns: repeat(7, 170px);
-    }
     .sim-day { min-height: 200px; padding: var(--sp-2); }
   }
 
@@ -895,8 +884,12 @@
 
     <div class="sim-controls">
       <label>
-        <span>budget semanal</span>
-        <input type="number" id="sim-budget" min="50" max="700" step="10" value="320" />
+        <span>dias</span>
+        <input type="number" id="sim-numdays" min="1" max="14" value="7" />
+      </label>
+      <label>
+        <span>budget total</span>
+        <input type="number" id="sim-budget" min="20" max="700" step="10" value="320" />
       </label>
       <label>
         <span>min por aula</span>
@@ -982,6 +975,7 @@ function computeSchedule() {
   const budget = +document.getElementById('sim-budget').value;
   const perAulaMin = +document.getElementById('sim-min').value;
   const perDayMax = +document.getElementById('sim-cap').value;
+  const numDays = Math.max(1, Math.min(14, +document.getElementById('sim-numdays').value || 7));
 
   const enriched = AULAS.map(a => ({ ...a, ...computePriority(a) }))
                         .sort((x, y) => y.priority - x.priority);
@@ -1016,20 +1010,25 @@ function computeSchedule() {
   }
   for (let i = 0; i < included.length; i++) included[i].sug = sug[i];
 
-  // Distribui em 7 dias round-robin por priority, respeitando cap diário
-  const days = Array.from({ length: 7 }, (_, i) => ({
-    idx: i, name: DAY_NAMES[i], aulas: [], used: 0
+  // Distribui em N dias round-robin por priority, respeitando cap diário
+  const days = Array.from({ length: numDays }, (_, i) => ({
+    idx: i,
+    // Pra janelas < 7 dias começa em SEG (mais natural quando o user pensa
+    // "vou estudar 3 dias"). Acima de 7 dias, repete os nomes em ciclos.
+    name: DAY_NAMES[i % 7],
+    aulas: [],
+    used: 0
   }));
   let dayIdx = 0;
   for (const a of included) {
     let placed = false;
-    for (let off = 0; off < 7; off++) {
-      const d = days[(dayIdx + off) % 7];
+    for (let off = 0; off < numDays; off++) {
+      const d = days[(dayIdx + off) % numDays];
       if (d.used + a.sug <= perDayMax) {
         d.aulas.push(a);
         d.used += a.sug;
         placed = true;
-        dayIdx = (dayIdx + 1) % 7;
+        dayIdx = (dayIdx + 1) % numDays;
         break;
       }
     }
@@ -1041,7 +1040,7 @@ function computeSchedule() {
     }
   }
 
-  return { enriched, included, days, budget, perDayMax };
+  return { enriched, included, days, budget, perDayMax, numDays };
 }
 
 function renderAulasList(enriched, included) {
@@ -1074,9 +1073,13 @@ function renderAulasList(enriched, included) {
   document.getElementById('sim-aulas-list').innerHTML = html;
 }
 
-function renderWeek(days, budget, perDayMax) {
+function renderWeek(days, budget, perDayMax, numDays) {
   const total = days.reduce((s, d) => s + d.used, 0);
   document.getElementById('sim-total').textContent = `${total}/${budget}`;
+  // Grid expande/encolhe pra refletir o numDays real. Acima de 7 dias
+  // ou em mobile, scroll horizontal cobre o overflow.
+  const grid = document.getElementById('sim-days');
+  grid.style.gridTemplateColumns = `repeat(${numDays}, minmax(140px, 1fr))`;
   const html = days.map(d => {
     const over = d.used > perDayMax;
     const aulasHtml = d.aulas
@@ -1102,9 +1105,9 @@ function renderWeek(days, budget, perDayMax) {
 }
 
 function render() {
-  const { enriched, included, days, budget, perDayMax } = computeSchedule();
+  const { enriched, included, days, budget, perDayMax, numDays } = computeSchedule();
   renderAulasList(enriched, included);
-  renderWeek(days, budget, perDayMax);
+  renderWeek(days, budget, perDayMax, numDays);
 }
 
 document.getElementById('sim-aulas-list').addEventListener('click', e => {
@@ -1126,6 +1129,7 @@ document.getElementById('sim-aulas-list').addEventListener('click', e => {
 document.getElementById('sim-budget').addEventListener('input', render);
 document.getElementById('sim-min').addEventListener('input', render);
 document.getElementById('sim-cap').addEventListener('input', render);
+document.getElementById('sim-numdays').addEventListener('input', render);
 document.getElementById('sim-reset').addEventListener('click', () => {
   sim.clear();
   render();
