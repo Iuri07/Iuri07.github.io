@@ -238,6 +238,8 @@
     font-family: var(--font-mono);
     font-size: var(--fs-sm);
     margin: var(--sp-3) 0 var(--sp-4);
+    /* Defesa contra overflow: em mobile vira block + scroll horizontal
+     * via override no @media abaixo. */
   }
   th, td {
     text-align: left;
@@ -481,9 +483,16 @@
     gap: 1px;
     background: var(--line-1);
   }
+  /* mobile: scroll horizontal preserva o "calendário de 7 dias" sem
+   * empilhar em coluna estranha (7 não divide bonito em 2). */
   @media (max-width: 720px) {
+    .sim-week {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     .sim-days {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(7, 200px);
+      min-width: max-content;
     }
   }
   .sim-day {
@@ -549,6 +558,109 @@
     font-variant-numeric: tabular-nums;
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
+  }
+
+  /* ─── mobile pass ─────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    .container {
+      /* corta o ar enorme nas bordas top/bottom; mantém respiração lateral
+       * compatível com touch (não cola na borda). */
+      padding: var(--sp-6) var(--sp-4);
+    }
+    h1 {
+      font-size: var(--fs-2xl);  /* 32px em vez de 44px */
+    }
+    .subtitle {
+      font-size: var(--fs-xs);
+    }
+    section {
+      margin-bottom: var(--sp-6);
+      padding-top: var(--sp-4);
+    }
+    /* a fórmula principal em destaque grande quebra layout em <360px;
+     * deixa scroll horizontal pra preservar tipografia mono alinhada. */
+    .formula.lg {
+      font-size: var(--fs-xl);
+      padding: var(--sp-5) var(--sp-4);
+    }
+    .formula {
+      padding: var(--sp-3) var(--sp-4);
+      font-size: var(--fs-md);
+    }
+    /* exemplo Crescimento: dl com label 160px fica apertado; vira coluna */
+    .example dl {
+      grid-template-columns: 1fr;
+      row-gap: var(--sp-1);
+    }
+    .example dt {
+      font-size: var(--fs-xs);
+    }
+    .example dd {
+      margin-bottom: var(--sp-2);
+    }
+    /* tabela do exemplo: scroll horizontal pra não estourar */
+    .example table {
+      display: block;
+      overflow-x: auto;
+    }
+    /* simulador: aula card mais compacto (prio menor, sem coluna q
+     * separada — junta tudo na linha de meta). */
+    .sim-aula {
+      grid-template-columns: 1fr 60px;
+      padding: var(--sp-2) var(--sp-3);
+    }
+    .sim-aula-q {
+      grid-column: 2;
+      grid-row: 2;
+      font-size: var(--fs-sm);
+      text-align: right;
+    }
+    .sim-aula-prio {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .sim-aula-prio-value {
+      font-size: var(--fs-sm);
+    }
+    .sim-aula-name {
+      font-size: var(--fs-xs);
+      line-height: 1.3;
+    }
+    .sim-aula-meta {
+      grid-column: 1;
+      font-size: 9px;
+    }
+    .sim-aula-meta .formula-inline {
+      margin-left: 0;
+    }
+    /* controles do sim em coluna estreita: empilha labels */
+    .sim-controls {
+      gap: var(--sp-3);
+      padding: var(--sp-3);
+    }
+    .sim-controls input {
+      width: 80px;
+    }
+    #sim-reset {
+      margin-left: 0;
+      width: 100%;
+    }
+    /* lista de aulas: limita altura pra caber + scroll, e adiciona
+     * indicador visual de que dá pra scrollar (sombra interna). */
+    #sim-aulas-list {
+      max-height: 360px;
+    }
+  }
+  @media (max-width: 420px) {
+    h1 { font-size: var(--fs-xl); }
+    .formula.lg { font-size: var(--fs-md); }
+    .container { padding: var(--sp-5) var(--sp-3); }
+    /* dia do calendário menor pra caber 2 quase visíveis e dar dica
+     * de scroll horizontal. */
+    .sim-days {
+      grid-template-columns: repeat(7, 170px);
+    }
+    .sim-day { min-height: 200px; padding: var(--sp-2); }
   }
 
   /* ─── footer ──────────────────────────────────────────────────── */
