@@ -1129,7 +1129,22 @@ document.getElementById('sim-aulas-list').addEventListener('click', e => {
 document.getElementById('sim-budget').addEventListener('input', render);
 document.getElementById('sim-min').addEventListener('input', render);
 document.getElementById('sim-cap').addEventListener('input', render);
-document.getElementById('sim-numdays').addEventListener('input', render);
+
+// Auto-scale do budget quando o user muda o número de dias: 320 é o
+// default semanal (7 dias), então budget vira (320 × numDays / 7).
+// O user pode override manualmente depois mexendo no campo budget; o
+// numDays só auto-scala enquanto não há sinal de override (heurística:
+// se o budget atual bate com a fórmula, ainda está em auto-mode).
+const WEEKLY_DEFAULT = 320;
+let budgetManuallySet = false;
+document.getElementById('sim-budget').addEventListener('input', () => { budgetManuallySet = true; });
+document.getElementById('sim-numdays').addEventListener('input', e => {
+  const n = Math.max(1, Math.min(14, +e.target.value || 7));
+  if (!budgetManuallySet) {
+    document.getElementById('sim-budget').value = Math.round(WEEKLY_DEFAULT * n / 7);
+  }
+  render();
+});
 document.getElementById('sim-reset').addEventListener('click', () => {
   sim.clear();
   render();
