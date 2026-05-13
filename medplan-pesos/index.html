@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>medplan · cálculo de pesos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #0B0B0D;
+    --bg-1: #15161A;
+    --bg-2: #1C1D22;
+    --bg-3: #25262C;
+
+    --fg-0: #C7C7CC;
+    --fg-1: #7A7B82;
+    --fg-2: #4A4C54;
+    --fg-3: #2F3038;
+
+    --line-1: #2A2C33;
+    --line-2: #353740;
+
+    --rgb-r: #FF2A2A;
+    --rgb-g: #19E37A;
+    --rgb-b: #2A6CFF;
+
+    --accent:      #9B7BFF;
+    --accent-soft: #6B5BB8;
+
+    --syn-red:    #E5484D;
+    --syn-green:  #4CC38A;
+    --syn-yellow: #E2B341;
+    --syn-cyan:   #5BC8D7;
+
+    --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --font-display: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --font-sans:    'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-reading: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+    --fs-xs: 12px;  --fs-sm: 13px;   --fs-base: 15px;
+    --fs-md: 17px;  --fs-lg: 20px;   --fs-xl:   24px;
+    --fs-2xl: 32px; --fs-3xl: 44px;  --fs-4xl:  64px;
+
+    --lh-tight: 1.15;  --lh-snug: 1.35;
+    --lh-base:  1.55;  --lh-loose: 1.7;
+
+    --tracking-tight: -0.01em;
+    --tracking-base:  0;
+    --tracking-wide:  0.08em;
+    --tracking-nav:   0.2em;
+
+    --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+    --sp-5: 24px;  --sp-6: 32px;  --sp-7: 48px;  --sp-8: 64px;  --sp-9: 96px;
+
+    --radius-0: 0px;   --radius-1: 4px;  --radius-2: 8px;
+    --radius-3: 12px;  --radius-pill: 999px;
+
+    --ease-out:    cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur-micro:   120ms;
+    --dur-state:   240ms;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg-0);
+    color: var(--fg-0);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    line-height: var(--lh-base);
+    min-height: 100vh;
+  }
+  ::selection { background: rgba(155,123,255,0.3); color: var(--fg-0); }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: var(--sp-9) var(--sp-5);
+  }
+
+  /* ─── header ──────────────────────────────────────────────────── */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--fg-1);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-nav);
+    margin-bottom: var(--sp-3);
+  }
+  .eyebrow .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: var(--sp-3);
+    vertical-align: middle;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--lh-tight);
+    margin: 0 0 var(--sp-4);
+    color: var(--fg-0);
+  }
+  /* chromatic aberration */
+  .ab { position: relative; display: inline-block; }
+  .ab::before, .ab::after {
+    content: attr(data-text);
+    position: absolute; left: 0; top: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .ab::before { color: var(--rgb-r); transform: translate(-1px, 0); }
+  .ab::after  { color: var(--rgb-b); transform: translate(1px, 0); }
+
+  .subtitle {
+    font-family: var(--font-reading);
+    font-size: var(--fs-sm);
+    color: var(--fg-1);
+    margin: 0 0 var(--sp-8);
+    max-width: 60ch;
+  }
+
+  /* ─── section ─────────────────────────────────────────────────── */
+  section {
+    margin-bottom: var(--sp-7);
+    padding-top: var(--sp-5);
+    border-top: 1px solid var(--line-1);
+  }
+  section:first-of-type { border-top: none; padding-top: 0; }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-nav);
+    color: var(--fg-1);
+    margin: 0 0 var(--sp-4);
+  }
+  h2 .num {
+    color: var(--accent);
+    margin-right: var(--sp-2);
+  }
+
+  p {
+    font-family: var(--font-reading);
+    font-size: var(--fs-sm);
+    color: var(--fg-0);
+    line-height: var(--lh-loose);
+    margin: 0 0 var(--sp-4);
+  }
+  p.muted {
+    color: var(--fg-1);
+    font-size: var(--fs-xs);
+  }
+
+  /* ─── formula box ─────────────────────────────────────────────── */
+  .formula {
+    background: var(--bg-1);
+    border: 1px solid var(--line-1);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-2);
+    padding: var(--sp-5) var(--sp-6);
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    color: var(--fg-0);
+    margin: var(--sp-3) 0 var(--sp-4);
+    overflow-x: auto;
+  }
+  .formula.lg {
+    font-size: var(--fs-2xl);
+    text-align: center;
+    padding: var(--sp-7) var(--sp-5);
+  }
+  .formula .op  { color: var(--fg-1); }
+  .formula .kw  { color: var(--accent); font-weight: 500; }
+  .formula .num { color: var(--syn-cyan); font-variant-numeric: tabular-nums; }
+  .formula .var { color: var(--fg-0); }
+  .formula .com { color: var(--fg-2); font-size: var(--fs-sm); font-style: italic; }
+
+  /* ─── branch table ────────────────────────────────────────────── */
+  .branch {
+    background: var(--bg-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-2);
+    padding: var(--sp-4);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-loose);
+    margin: 0 0 var(--sp-4);
+  }
+  .branch-row {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: var(--sp-3);
+    padding: var(--sp-2) 0;
+  }
+  .branch-row + .branch-row {
+    border-top: 1px dashed var(--line-1);
+  }
+  .branch-glyph {
+    color: var(--accent-soft);
+    text-align: center;
+    user-select: none;
+  }
+  .branch-content { color: var(--fg-0); }
+  .branch-content .cond {
+    color: var(--syn-yellow);
+    font-weight: 500;
+  }
+  .branch-content .com {
+    color: var(--fg-1);
+    margin-left: var(--sp-3);
+    font-size: var(--fs-xs);
+  }
+
+  /* ─── inline code ─────────────────────────────────────────────── */
+  code {
+    font-family: var(--font-mono);
+    font-size: 90%;
+    color: var(--accent);
+    background: var(--bg-1);
+    border: 1px solid var(--line-1);
+    padding: 1px 6px;
+    border-radius: var(--radius-1);
+  }
+
+  /* ─── table ───────────────────────────────────────────────────── */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    margin: var(--sp-3) 0 var(--sp-4);
+  }
+  th, td {
+    text-align: left;
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid var(--line-1);
+  }
+  th {
+    font-weight: 500;
+    color: var(--fg-1);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    font-size: var(--fs-xs);
+  }
+  td { color: var(--fg-0); }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  tr.before td.var { color: var(--syn-red); }
+  tr.after td.var { color: var(--syn-green); font-weight: 500; }
+
+  /* ─── example callout ─────────────────────────────────────────── */
+  .example {
+    background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-2);
+    padding: var(--sp-5) var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+  .example-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--accent);
+    margin: 0 0 var(--sp-3);
+  }
+  .example dl {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    row-gap: var(--sp-2);
+    column-gap: var(--sp-3);
+  }
+  .example dt { color: var(--fg-1); }
+  .example dd { margin: 0; color: var(--fg-0); }
+  .example dd .num { color: var(--syn-cyan); font-variant-numeric: tabular-nums; }
+  .example .delta {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-4);
+    border-top: 1px dashed var(--line-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--fg-0);
+  }
+  .example .delta .up { color: var(--syn-green); font-weight: 600; }
+
+  /* ─── footer ──────────────────────────────────────────────────── */
+  footer {
+    margin-top: var(--sp-9);
+    padding-top: var(--sp-5);
+    border-top: 1px solid var(--line-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--fg-2);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="eyebrow"><span class="dot"></span>medplan / schedule.ts / aulaPriority</div>
+  <h1><span class="ab" data-text="cálculo dos pesos">cálculo dos pesos</span></h1>
+  <p class="subtitle">
+    como o medplan decide quantas questões cada aula recebe na semana.
+    três sinais: <strong>incidência</strong> (quão recorrente é o tópico
+    no banco), <strong>fraqueza</strong> (o quanto você erra) e o
+    <strong>cap diário</strong> (não sobrecarregar um dia).
+  </p>
+
+  <section>
+    <h2><span class="num">①</span>fórmula principal</h2>
+    <div class="formula lg">
+      <span class="var">priority</span>
+      <span class="op">=</span>
+      <span class="var">baseWeight</span>
+      <span class="op">×</span>
+      <span class="op">(</span>0.5
+      <span class="op">+</span>
+      <span class="var">weakness</span><span class="op">)</span>
+    </div>
+    <p>
+      <code>baseWeight</code> mede incidência (em 1..~30). <code>weakness</code>
+      vive em 0..1 (0 = domina, 1 = zero acerto). O <code>+0.5</code> evita
+      que aula 100% dominada zere — multiplier final vai de <strong>0.5×</strong>
+      a <strong>1.5×</strong>.
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="num">②</span>baseWeight — incidência</h2>
+    <p>Três fontes, em ordem de preferência:</p>
+    <div class="branch">
+      <div class="branch-row">
+        <div class="branch-glyph">├</div>
+        <div class="branch-content">
+          <span class="cond">se totalQuestions &gt; 0</span> →
+          <strong>√totalQuestions</strong>
+          <span class="com">(sync de incidência rodou — usa contagem real do banco)</span>
+        </div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-glyph">├</div>
+        <div class="branch-content">
+          <span class="cond">senão se há tier</span> →
+          <strong>TIER_WEIGHT[incidenceTier]</strong>
+          <span class="com">(fallback do cronograma)</span>
+        </div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-glyph">└</div>
+        <div class="branch-content">
+          <span class="cond">default</span> → <strong>4</strong>
+          <span class="com">(sem info nenhuma)</span>
+        </div>
+      </div>
+    </div>
+    <p>
+      O <code>√</code> amortece tópicos gigantes: 400 questões = √400 = 20;
+      40 questões = √40 ≈ 6.3. Diferença vira ~3× em vez de 10×.
+    </p>
+    <table>
+      <thead>
+        <tr><th>tier</th><th class="num">peso</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>muito-alta</td><td class="num">16</td></tr>
+        <tr><td>alta</td><td class="num">8</td></tr>
+        <tr><td>media</td><td class="num">4</td></tr>
+        <tr><td>baixa</td><td class="num">2</td></tr>
+        <tr><td>muito-baixa</td><td class="num">1</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="num">③</span>weakness — performance</h2>
+    <p>
+      Combina dois sinais. <code>latestReviewPct</code> é o pct da revisão
+      <strong>mais recente feita no medplan</strong> (varre A4 → A3 → A2 → A1,
+      pega o primeiro nível com nota registrada). <code>accuracyPct</code> vem
+      dos cadernos do Estratégia, sincronizado no walk de classificações
+      (sinal mais amplo, geralmente mais antigo).
+    </p>
+    <div class="branch">
+      <div class="branch-row">
+        <div class="branch-glyph">├</div>
+        <div class="branch-content">
+          <span class="cond">se ambos existem</span> →
+          <strong>effective = avg(accuracyPct, latestReviewPct)</strong>
+        </div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-glyph">├</div>
+        <div class="branch-content">
+          <span class="cond">se só revisão</span> →
+          <strong>effective = latestReviewPct</strong>
+        </div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-glyph">├</div>
+        <div class="branch-content">
+          <span class="cond">se só caderno</span> →
+          <strong>effective = accuracyPct</strong>
+        </div>
+      </div>
+      <div class="branch-row">
+        <div class="branch-glyph">└</div>
+        <div class="branch-content">
+          <span class="cond">nenhum</span> →
+          <strong>weakness = 0.5</strong>
+          <span class="com">(default neutro)</span>
+        </div>
+      </div>
+    </div>
+    <div class="formula">
+      <span class="var">weakness</span>
+      <span class="op">=</span>
+      <span class="kw">max</span><span class="op">(</span>0<span class="op">,</span>
+      1 <span class="op">−</span> effective <span class="op">/</span> 100<span class="op">)</span>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">④</span>orçamento semanal</h2>
+    <p>
+      Greedy: ordena aulas pendentes por <code>priority DESC</code> (tiebreak
+      <code>dueDate ASC</code> — overdue ganha). Inclui do topo até o bottom
+      enquanto a parcela da próxima aula ≥ <code>perAulaMin</code> (default 4).
+      Resto fica de fora (não recebe questão essa semana).
+    </p>
+    <div class="formula">
+      <span class="var">share_i</span>
+      <span class="op">=</span>
+      <span class="var">weeklyBudget</span>
+      <span class="op">×</span>
+      <span class="var">priority_i</span>
+      <span class="op">/</span>
+      <span class="kw">Σ</span><span class="var">priority_incluídas</span>
+    </div>
+    <p>
+      Para fechar exatamente no <code>weeklyBudget</code>: largest-remainder.
+      Pisa em <code>floor(share)</code>, depois distribui as sobras pras
+      aulas com maior parte fracionária.
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="num">⑤</span>cap diário</h2>
+    <p>
+      Caminha dia a dia. Pra cada dia: sort por priority desc, enche até bater
+      <code>perDayMax</code>. O que sobrar vai pro próximo dia com folga; se
+      nenhum tem, vai pro com menos carga (espalha overflow). Último dia da
+      janela aceita o excedente.
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="num">⑥</span>exemplo — Crescimento</h2>
+    <div class="example">
+      <div class="example-title">cenário</div>
+      <dl>
+        <dt>totalQuestions</dt><dd><span class="num">509</span></dd>
+        <dt>baseWeight</dt><dd>√509 ≈ <span class="num">22.6</span></dd>
+        <dt>accuracyPct (caderno)</dt><dd><span class="num">70%</span></dd>
+        <dt>A1 feita</dt><dd><span class="num">30%</span></dd>
+      </dl>
+
+      <table>
+        <thead>
+          <tr><th>versão</th><th>effective</th><th>weakness</th><th class="num">priority</th></tr>
+        </thead>
+        <tbody>
+          <tr class="before">
+            <td class="var">antes (só caderno)</td>
+            <td>70%</td>
+            <td>0.30</td>
+            <td class="num">22.6 × 0.80 = 18.1</td>
+          </tr>
+          <tr class="after">
+            <td class="var">agora (caderno + A1)</td>
+            <td>50%</td>
+            <td>0.50</td>
+            <td class="num">22.6 × 1.00 = 22.6</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="delta">
+        <span class="up">+25%</span> de peso por incluir o sinal recente
+        da revisão fraca. Mais slots de questões alocados pra Crescimento
+        essa semana — sistema reage à performance atual em vez de ficar
+        preso no histórico dos cadernos.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    medplan v0.1.8 · electron/sync/schedule.ts · 2026
+  </footer>
+
+</div>
+</body>
+</html>
