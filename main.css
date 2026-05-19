@@ -1,20 +1,98 @@
-body{
-  font-family: 'Open Sans Condensed', sans-serif;
+:root {
+  --bg-0: #0B0B0D;
+  --bg-1: #15161A;
+  --bg-2: #1C1D22;
+
+  --fg-0: #C7C7CC;
+  --fg-1: #7A7B82;
+  --fg-2: #4A4C54;
+
+  --line-1: #2A2C33;
+
+  --rgb-r: #FF2A2A;
+  --rgb-g: #19E37A;
+  --rgb-b: #2A6CFF;
+
+  --accent:      #9B7BFF;
+  --accent-soft: #6B5BB8;
+
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-display: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-sans:    'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-reading: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --tracking-nav:   0.2em;
+
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-micro: 120ms;
+  --dur-state: 240ms;
 }
 
-.link-container{
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-0);
+  color: var(--fg-0);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection { background: rgba(155, 123, 255, 0.3); color: var(--fg-0); }
+
+canvas { display: block; }
+
+.link-container {
   position: fixed;
-  left: 50%;
-  top: 50%;
-  font-size: 4vmin;
-  width: 35vmin;
-  height: 100px;
-  margin-top: -50px;
-  margin-left: calc(-35vmin / 2);
-  text-align: center;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  pointer-events: none;
 }
 
-.link-container a{
-  color: #aaa;
-  margin:10px;
+.link-container a {
+  pointer-events: auto;
+  position: relative;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(13px, 2.2vmin, 18px);
+  letter-spacing: var(--tracking-nav);
+  text-transform: uppercase;
+  color: var(--fg-1);
+  text-decoration: none;
+  padding: var(--sp-2) var(--sp-3);
+  transition:
+    color var(--dur-state) var(--ease-out),
+    text-shadow var(--dur-micro) var(--ease-out);
+}
+
+.link-container a::before {
+  content: '> ';
+  color: var(--fg-2);
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.link-container a:hover,
+.link-container a:focus-visible {
+  color: var(--fg-0);
+  outline: none;
+  text-shadow:
+    -1px 0 0 var(--rgb-r),
+     1px 0 0 var(--rgb-b);
+}
+
+.link-container a:hover::before,
+.link-container a:focus-visible::before {
+  color: var(--accent);
 }

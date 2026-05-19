@@ -50,7 +50,7 @@ function draw(){
     radius = Math.min(width, height) / 2 - 50;
 
     blendMode(BLEND)
-    background(20);
+    background(11, 11, 13);
 
     colorMode(RGB, 255, 255, 255, 1);
     blendMode(SCREEN);
